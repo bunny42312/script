@@ -57,6 +57,7 @@ for i,v in pairs(getgc(true)) do
     end
 end
 
+
 spawn(function()
     pcall(function()
         while wait(10) do
@@ -66,7 +67,7 @@ spawn(function()
                         [1] = _G.NameGift,
                         [2] = "HN GIF",
                         [3] = "Currency",
-                        [4] = DiamondC,
+                        [4] = _G.DiamondC,
                         [5] = game.Players.LocalPlayer:WaitForChild("leaderstats")["💎 Diamonds"].Value - 10000
                     }
                     
