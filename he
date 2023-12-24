@@ -10,7 +10,17 @@ spawn(function()
         end
     end
 end)
-
+spawn(function()
+    pcall(function()
+        while wait(2) do
+            for i,v in pairs(game.workspace.__THINGS.Breakables:GetChildren()) do
+                if not v:GetAttribute("VIPBreakable") then
+                    v:Destroy()
+                end
+            end
+        end
+    end)
+end)
 spawn(function()
     pcall(function()
         while task.wait() do
