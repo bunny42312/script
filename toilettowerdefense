@@ -118,11 +118,11 @@ spawn(function()
 
                 if game.PlaceId == 13775256536 then
 
-                    if game:GetService("Players").LocalPlayer.PlayerGui.Lobby.QueueFrame.Visible == false and tonumber(game:GetService("Players").LocalPlayer.PlayerGui.Lobby.CurrenciesFrame.CandyAmount.CurrencyLayout.AmountLabel.Text) < 50000 then
+                    if game:GetService("Players").LocalPlayer.PlayerGui.Lobby.QueueFrame.Visible == false then 
 
                         for i,v in pairs(workspace.Lifts:GetChildren()) do
 
-                            if v.Name == "PalmParadise" and v.Base.StatusGui.PlayersCount.Text == "0/5" then
+                            if v.Name == _G.Map and v.Base.StatusGui.PlayersCount.Text == "0/5" then
 
                                 if game:GetService("Players").LocalPlayer.PlayerGui.Lobby.QueueFrame.Visible == false then
 
@@ -142,10 +142,11 @@ spawn(function()
 
                 end
 
+            end
 
 
-        end
 
+        
     end)
 
 end)
