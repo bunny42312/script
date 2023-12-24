@@ -3,7 +3,7 @@ repeat wait() until game:IsLoaded()
 
 wait(5)
 
-spwan(function()
+spawn(function()
     for i,v in pairs(workspace.Map:GetChildren()) do
         if v.Name ~= "1 | Spawn" then
             v:Destroy()
@@ -20,6 +20,7 @@ spawn(function()
         end
     end)
 end)
+
 spawn(function()
     _G.Data_Trade = {}
     _G.T = {}
