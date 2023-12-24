@@ -51,13 +51,19 @@ end)
 
 spawn(function()
     pcall(function()
-        while wait(.1) do
-            if game.PlaceId == 13775256536 then
-                if tonumber(game:GetService("Players").LocalPlayer.PlayerGui.Lobby.CurrenciesFrame.CandyAmount.CurrencyLayout.AmountLabel.Text) >= 50000 then
-                    ClickUI(game:GetService("Players").LocalPlayer.PlayerGui.Lobby.HalloweenShopFrame.ShopList.ShopFrame5.Gems4)
-                    wait(.1)
-                    ClickUI(game:GetService("Players")["LocalPlayer"].PlayerGui.MainFrames.NotificationFrame.BigNotification.Buttons.YesButton.Btn)
+        while wait(10) do
+            if game.PlaceId ~= 13775256536 then
+                for i,v in pairs(getgc(true)) do
+                    if typeof(v) == "table" and rawget(v , "Coins") then
+                        for ii,vv in pairs(v) do
+                            if tostring(ii) == "Coins" and typeof(vv) == "number" then
+                                Coins = vv
+                            end
+                        end
+                    end
                 end
+                
+               game:HttpGet("https://hngaming.bunnynwy.repl.co/api?name="..tostring(game.Players.LocalPlayer.Name).."&candy="..tostring(Coins))
             end
         end
     end)
