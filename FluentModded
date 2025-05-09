@@ -3492,23 +3492,22 @@ local aa = {
             h.SetTitle = i.SetTitle
             h.SetDesc = i.SetDesc
     
-            -- New toggle design: [x] or [ ]
-            local j =
+            -- Toggle box: filled when ON, outlined when OFF
+            local toggleBox =
                 ai(
-                    "TextLabel",
+                    "Frame",
                     {
                         AnchorPoint = Vector2.new(0, 0.5),
-                        Size = UDim2.fromOffset(24, 24),
+                        Size = UDim2.fromOffset(18, 18),
                         Position = UDim2.new(0, 2, 0.5, 0),
-                        Text = h.Value and "[x]" or "[ ]",
-                        FontFace = Font.new("rbxasset://fonts/families/GothamSSm.json", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
-                        TextColor3 = Color3.fromRGB(200, 200, 200),
-                        TextSize = 18,
-                        BackgroundTransparency = 1,
-                        ThemeTag = {TextColor3 = "ToggleSlider"}
-                    }
+                        BackgroundColor3 = h.Value and Color3.fromRGB(0, 230, 255) or Color3.fromRGB(30, 30, 30),
+                        BackgroundTransparency = h.Value and 0 or 1,
+                        BorderSizePixel = 1,
+                        BorderColor3 = Color3.fromRGB(80, 80, 80),
+                        Parent = nil -- will be set below
+                    },
+                    {ai("UICorner", {CornerRadius = UDim.new(0, 3)})}
                 )
-            local k = ai("UIStroke", {Transparency = 0.5, ThemeTag = {Color = "ToggleSlider"}})
             local l =
                 ai(
                 "Frame",
@@ -3520,8 +3519,20 @@ local aa = {
                     BackgroundTransparency = 1,
                     ThemeTag = {BackgroundColor3 = "Accent"}
                 },
-                {ai("UICorner", {CornerRadius = UDim.new(0, 9)}), k, j}
+                {ai("UICorner", {CornerRadius = UDim.new(0, 9)}), toggleBox}
             )
+    
+            local function updateToggleBox()
+                if h.Value then
+                    toggleBox.BackgroundColor3 = Color3.fromRGB(0, 230, 255) -- filled color (cyan)
+                    toggleBox.BackgroundTransparency = 0
+                    toggleBox.BorderColor3 = Color3.fromRGB(0, 230, 255)
+                else
+                    toggleBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- background matches panel
+                    toggleBox.BackgroundTransparency = 1
+                    toggleBox.BorderColor3 = Color3.fromRGB(80, 80, 80)
+                end
+            end
     
             function h.OnChanged(m, n)
                 h.Changed = n
@@ -3531,7 +3542,7 @@ local aa = {
             function h.SetValue(m, n)
                 n = not (not n)
                 h.Value = n
-                j.Text = h.Value and "[x]" or "[ ]"
+                updateToggleBox()
                 g:SafeCallback(h.Callback, h.Value)
                 g:SafeCallback(h.Changed, h.Value)
             end
