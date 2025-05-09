@@ -1,0 +1,1134 @@
+--[[
+    GitHub: https://github.com/dawid-scripts/Fluent
+--]]
+
+local Fluent = {}
+
+-- Services
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local TextService = game:GetService("TextService")
+local UserInputService = game:GetService("UserInputService")
+local ContextActionService = game:GetService("ContextActionService")
+local CoreGui = game:GetService("CoreGui")
+
+-- Variables
+local Player = Players.LocalPlayer
+local Mouse = Player:GetMouse()
+local Camera = workspace.CurrentCamera
+
+-- Apple Design System
+local AppleDesign = {
+    -- SF Pro Font Family
+    Font = {
+        Title = Font.new("rbxasset://fonts/families/SFProDisplay-Bold.otf", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
+        Subtitle = Font.new("rbxasset://fonts/families/SFProDisplay-Semibold.otf", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
+        Regular = Font.new("rbxasset://fonts/families/SFProText-Regular.otf", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
+        Medium = Font.new("rbxasset://fonts/families/SFProText-Medium.otf", Enum.FontWeight.Medium, Enum.FontStyle.Normal),
+        Light = Font.new("rbxasset://fonts/families/SFProText-Light.otf", Enum.FontWeight.Light, Enum.FontStyle.Normal),
+    },
+    
+    -- Apple Color Palette
+    Colors = {
+        -- Primary Colors
+        Primary = Color3.fromRGB(0, 122, 255), -- Apple Blue
+        Secondary = Color3.fromRGB(142, 142, 147), -- Apple Gray
+        
+        -- System Colors
+        Red = Color3.fromRGB(255, 59, 48),
+        Orange = Color3.fromRGB(255, 149, 0),
+        Yellow = Color3.fromRGB(255, 204, 0),
+        Green = Color3.fromRGB(52, 199, 89),
+        Mint = Color3.fromRGB(0, 199, 190),
+        Teal = Color3.fromRGB(48, 176, 199),
+        Cyan = Color3.fromRGB(50, 173, 230),
+        Blue = Color3.fromRGB(0, 122, 255),
+        Indigo = Color3.fromRGB(88, 86, 214),
+        Purple = Color3.fromRGB(175, 82, 222),
+        Pink = Color3.fromRGB(255, 45, 85),
+        Brown = Color3.fromRGB(162, 132, 94),
+        
+        -- Light Mode
+        Background = Color3.fromRGB(242, 242, 247),
+        SecondaryBackground = Color3.fromRGB(255, 255, 255),
+        TertiaryBackground = Color3.fromRGB(242, 242, 247),
+        GroupedBackground = Color3.fromRGB(242, 242, 247),
+        
+        -- Text Colors
+        Label = Color3.fromRGB(0, 0, 0),
+        SecondaryLabel = Color3.fromRGB(60, 60, 67, 0.6),
+        TertiaryLabel = Color3.fromRGB(60, 60, 67, 0.3),
+        QuaternaryLabel = Color3.fromRGB(60, 60, 67, 0.18),
+        
+        -- Separator and Fill
+        Separator = Color3.fromRGB(60, 60, 67, 0.29),
+        Fill = Color3.fromRGB(120, 120, 128, 0.2),
+        SecondaryFill = Color3.fromRGB(120, 120, 128, 0.16),
+        TertiaryFill = Color3.fromRGB(118, 118, 128, 0.12),
+        QuaternaryFill = Color3.fromRGB(116, 116, 128, 0.08),
+    },
+    
+    -- UI Design Elements
+    Elements = {
+        CornerRadius = UDim.new(0, 10), -- Apple's rounded corners
+        ButtonHeight = 44, -- Standard button height
+        Padding = 16, -- Standard padding
+        IconSize = 24, -- Standard icon size
+        BorderWidth = 1, -- Thin borders
+        ShadowSize = 2, -- Subtle shadows
+        ShadowTransparency = 0.85, -- Apple's shadow transparency
+        AnimationDuration = 0.3, -- Animation duration
+        AnimationEasingStyle = Enum.EasingStyle.Cubic,
+        AnimationEasingDirection = Enum.EasingDirection.Out,
+    }
+}
+
+-- Create UI
+function Fluent:CreateWindow(options)
+    options = options or {}
+    options.Title = options.Title or "Apple UI"
+    options.SubTitle = options.SubTitle or "Powered by Fluent"
+    options.TabWidth = options.TabWidth or 170
+    options.Size = options.Size or UDim2.new(0, 600, 0, 400)
+    options.Acrylic = options.Acrylic or true
+    options.Theme = options.Theme or "Light"
+    options.MinimizeKey = options.MinimizeKey or Enum.KeyCode.LeftControl
+    
+    -- Main UI Components
+    local Window = {}
+    
+    -- Create ScreenGui
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "AppleUI"
+    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.DisplayOrder = 100
+    
+    -- Parent ScreenGui
+    if RunService:IsStudio() then
+        ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    else
+        if syn then
+            syn.protect_gui(ScreenGui)
+            ScreenGui.Parent = game.CoreGui
+        else
+            ScreenGui.Parent = game.CoreGui
+        end
+    end
+    
+    -- Main Frame
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Name = "MainFrame"
+    MainFrame.Size = options.Size
+    MainFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+    MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    MainFrame.BackgroundColor3 = AppleDesign.Colors.SecondaryBackground
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Parent = ScreenGui
+    
+    -- Apply Corner Radius
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = AppleDesign.Elements.CornerRadius
+    Corner.Parent = MainFrame
+    
+    -- Apply Shadow
+    local Shadow = Instance.new("ImageLabel")
+    Shadow.Name = "Shadow"
+    Shadow.AnchorPoint = Vector2.new(0.5, 0.5)
+    Shadow.BackgroundTransparency = 1
+    Shadow.Position = UDim2.new(0.5, 0, 0.5, 0)
+    Shadow.Size = UDim2.new(1, 30, 1, 30)
+    Shadow.ZIndex = -1
+    Shadow.Image = "rbxassetid://6014261993"
+    Shadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    Shadow.ImageTransparency = AppleDesign.Elements.ShadowTransparency
+    Shadow.ScaleType = Enum.ScaleType.Slice
+    Shadow.SliceCenter = Rect.new(49, 49, 450, 450)
+    Shadow.Parent = MainFrame
+    
+    -- Title Bar
+    local TitleBar = Instance.new("Frame")
+    TitleBar.Name = "TitleBar"
+    TitleBar.Size = UDim2.new(1, 0, 0, 50)
+    TitleBar.BackgroundColor3 = AppleDesign.Colors.SecondaryBackground
+    TitleBar.BorderSizePixel = 0
+    TitleBar.Parent = MainFrame
+    
+    -- Title Bar Corner
+    local TitleBarCorner = Instance.new("UICorner")
+    TitleBarCorner.CornerRadius = UDim.new(0, 10)
+    TitleBarCorner.Parent = TitleBar
+    
+    -- Title
+    local Title = Instance.new("TextLabel")
+    Title.Name = "Title"
+    Title.Text = options.Title
+    Title.FontFace = AppleDesign.Font.Title
+    Title.TextSize = 18
+    Title.TextColor3 = AppleDesign.Colors.Label
+    Title.BackgroundTransparency = 1
+    Title.Position = UDim2.new(0, 15, 0, 0)
+    Title.Size = UDim2.new(0.5, 0, 1, 0)
+    Title.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Parent = TitleBar
+    
+    -- Subtitle
+    local SubTitle = Instance.new("TextLabel")
+    SubTitle.Name = "SubTitle"
+    SubTitle.Text = options.SubTitle
+    SubTitle.FontFace = AppleDesign.Font.Regular
+    SubTitle.TextSize = 14
+    SubTitle.TextColor3 = AppleDesign.Colors.SecondaryLabel
+    SubTitle.BackgroundTransparency = 1
+    SubTitle.Position = UDim2.new(0, 15, 0.65, 0)
+    SubTitle.Size = UDim2.new(0.5, 0, 0, 20)
+    SubTitle.TextXAlignment = Enum.TextXAlignment.Left
+    SubTitle.Parent = TitleBar
+    
+    -- Close Button
+    local CloseButton = Instance.new("TextButton")
+    CloseButton.Name = "CloseButton"
+    CloseButton.Text = "×"
+    CloseButton.FontFace = AppleDesign.Font.Medium
+    CloseButton.TextSize = 20
+    CloseButton.TextColor3 = AppleDesign.Colors.Label
+    CloseButton.BackgroundColor3 = AppleDesign.Colors.Red
+    CloseButton.Position = UDim2.new(1, -40, 0.5, 0)
+    CloseButton.Size = UDim2.new(0, 24, 0, 24)
+    CloseButton.AnchorPoint = Vector2.new(0.5, 0.5)
+    CloseButton.Parent = TitleBar
+    
+    -- Close Button Corner
+    local CloseButtonCorner = Instance.new("UICorner")
+    CloseButtonCorner.CornerRadius = UDim.new(0, 12)
+    CloseButtonCorner.Parent = CloseButton
+    
+    -- Minimize Button
+    local MinimizeButton = Instance.new("TextButton")
+    MinimizeButton.Name = "MinimizeButton"
+    MinimizeButton.Text = "−"
+    MinimizeButton.FontFace = AppleDesign.Font.Medium
+    MinimizeButton.TextSize = 20
+    MinimizeButton.TextColor3 = AppleDesign.Colors.Label
+    MinimizeButton.BackgroundColor3 = AppleDesign.Colors.Yellow
+    MinimizeButton.Position = UDim2.new(1, -70, 0.5, 0)
+    MinimizeButton.Size = UDim2.new(0, 24, 0, 24)
+    MinimizeButton.AnchorPoint = Vector2.new(0.5, 0.5)
+    MinimizeButton.Parent = TitleBar
+    
+    -- Minimize Button Corner
+    local MinimizeButtonCorner = Instance.new("UICorner")
+    MinimizeButtonCorner.CornerRadius = UDim.new(0, 12)
+    MinimizeButtonCorner.Parent = MinimizeButton
+    
+    -- Content Container
+    local ContentContainer = Instance.new("Frame")
+    ContentContainer.Name = "ContentContainer"
+    ContentContainer.Size = UDim2.new(1, 0, 1, -50)
+    ContentContainer.Position = UDim2.new(0, 0, 0, 50)
+    ContentContainer.BackgroundColor3 = AppleDesign.Colors.SecondaryBackground
+    ContentContainer.BorderSizePixel = 0
+    ContentContainer.Parent = MainFrame
+    
+    -- Tab Container
+    local TabContainer = Instance.new("Frame")
+    TabContainer.Name = "TabContainer"
+    TabContainer.Size = UDim2.new(0, options.TabWidth, 1, 0)
+    TabContainer.BackgroundColor3 = AppleDesign.Colors.TertiaryBackground
+    TabContainer.BorderSizePixel = 0
+    TabContainer.Parent = ContentContainer
+    
+    -- Tab Container Corner
+    local TabContainerCorner = Instance.new("UICorner")
+    TabContainerCorner.CornerRadius = UDim.new(0, 10)
+    TabContainerCorner.Parent = TabContainer
+    
+    -- Tab List
+    local TabList = Instance.new("ScrollingFrame")
+    TabList.Name = "TabList"
+    TabList.Size = UDim2.new(1, 0, 1, 0)
+    TabList.BackgroundTransparency = 1
+    TabList.BorderSizePixel = 0
+    TabList.ScrollBarThickness = 0
+    TabList.ScrollingDirection = Enum.ScrollingDirection.Y
+    TabList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    TabList.CanvasSize = UDim2.new(0, 0, 0, 0)
+    TabList.Parent = TabContainer
+    
+    -- Tab List Layout
+    local TabListLayout = Instance.new("UIListLayout")
+    TabListLayout.Padding = UDim.new(0, 5)
+    TabListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    TabListLayout.Parent = TabList
+    
+    -- Tab List Padding
+    local TabListPadding = Instance.new("UIPadding")
+    TabListPadding.PaddingTop = UDim.new(0, 10)
+    TabListPadding.PaddingBottom = UDim.new(0, 10)
+    TabListPadding.Parent = TabList
+    
+    -- Tab Content
+    local TabContent = Instance.new("Frame")
+    TabContent.Name = "TabContent"
+    TabContent.Size = UDim2.new(1, -options.TabWidth, 1, 0)
+    TabContent.Position = UDim2.new(0, options.TabWidth, 0, 0)
+    TabContent.BackgroundColor3 = AppleDesign.Colors.SecondaryBackground
+    TabContent.BorderSizePixel = 0
+    TabContent.Parent = ContentContainer
+    
+    -- Tab Content Corner
+    local TabContentCorner = Instance.new("UICorner")
+    TabContentCorner.CornerRadius = UDim.new(0, 10)
+    TabContentCorner.Parent = TabContent
+    
+    -- Make UI Draggable
+    local dragging
+    local dragInput
+    local dragStart
+    local startPos
+    
+    local function updateDrag(input)
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+    
+    TitleBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = MainFrame.Position
+            
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    
+    TitleBar.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            updateDrag(input)
+        end
+    end)
+    
+    -- Close Button Functionality
+    CloseButton.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+    
+    -- Minimize Button Functionality
+    local minimized = false
+    MinimizeButton.MouseButton1Click:Connect(function()
+        minimized = not minimized
+        if minimized then
+            MainFrame:TweenSize(UDim2.new(0, options.Size.X.Offset, 0, 50), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.3, true)
+        else
+            MainFrame:TweenSize(options.Size, Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.3, true)
+        end
+    end)
+    
+    -- Tabs
+    local Tabs = {}
+    local first = true
+    
+    -- Create Tab
+    function Window:CreateTab(options)
+        options = options or {}
+        options.Name = options.Name or "Tab"
+        options.Icon = options.Icon or "rbxassetid://7733715400"
+        
+        local Tab = {}
+        
+        -- Tab Button
+        local TabButton = Instance.new("TextButton")
+        TabButton.Name = options.Name.."TabButton"
+        TabButton.Text = options.Name
+        TabButton.FontFace = AppleDesign.Font.Medium
+        TabButton.TextSize = 14
+        TabButton.TextColor3 = AppleDesign.Colors.Label
+        TabButton.BackgroundColor3 = first and AppleDesign.Colors.Fill or AppleDesign.Colors.SecondaryBackground
+        TabButton.Size = UDim2.new(0.9, 0, 0, 36)
+        TabButton.AutoButtonColor = false
+        TabButton.Parent = TabList
+        
+        -- Tab Button Corner
+        local TabButtonCorner = Instance.new("UICorner")
+        TabButtonCorner.CornerRadius = UDim.new(0, 8)
+        TabButtonCorner.Parent = TabButton
+        
+        -- Tab Icon
+        local TabIcon = Instance.new("ImageLabel")
+        TabIcon.Name = "Icon"
+        TabIcon.Image = options.Icon
+        TabIcon.BackgroundTransparency = 1
+        TabIcon.Size = UDim2.new(0, 20, 0, 20)
+        TabIcon.Position = UDim2.new(0, 10, 0.5, 0)
+        TabIcon.AnchorPoint = Vector2.new(0, 0.5)
+        TabIcon.Parent = TabButton
+        
+        -- Tab Frame
+        local TabFrame = Instance.new("ScrollingFrame")
+        TabFrame.Name = options.Name.."Tab"
+        TabFrame.Size = UDim2.new(1, 0, 1, 0)
+        TabFrame.BackgroundTransparency = 1
+        TabFrame.BorderSizePixel = 0
+        TabFrame.ScrollBarThickness = 2
+        TabFrame.ScrollBarImageColor3 = AppleDesign.Colors.SecondaryLabel
+        TabFrame.ScrollingDirection = Enum.ScrollingDirection.Y
+        TabFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        TabFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+        TabFrame.Visible = first
+        TabFrame.Parent = TabContent
+        
+        -- Tab Frame Layout
+        local TabFrameLayout = Instance.new("UIListLayout")
+        TabFrameLayout.Padding = UDim.new(0, 10)
+        TabFrameLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        TabFrameLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        TabFrameLayout.Parent = TabFrame
+        
+        -- Tab Frame Padding
+        local TabFramePadding = Instance.new("UIPadding")
+        TabFramePadding.PaddingTop = UDim.new(0, 10)
+        TabFramePadding.PaddingBottom = UDim.new(0, 10)
+        TabFramePadding.PaddingLeft = UDim.new(0, 10)
+        TabFramePadding.PaddingRight = UDim.new(0, 10)
+        TabFramePadding.Parent = TabFrame
+        
+        -- Tab Button Click
+        TabButton.MouseButton1Click:Connect(function()
+            for _, button in pairs(TabList:GetChildren()) do
+                if button:IsA("TextButton") then
+                    button.BackgroundColor3 = AppleDesign.Colors.SecondaryBackground
+                end
+            end
+            
+            for _, frame in pairs(TabContent:GetChildren()) do
+                if frame:IsA("ScrollingFrame") then
+                    frame.Visible = false
+                end
+            end
+            
+            TabButton.BackgroundColor3 = AppleDesign.Colors.Fill
+            TabFrame.Visible = true
+        end)
+        
+        -- Create Section
+        function Tab:CreateSection(options)
+            options = options or {}
+            options.Name = options.Name or "Section"
+            
+            local Section = {}
+            
+            -- Section Frame
+            local SectionFrame = Instance.new("Frame")
+            SectionFrame.Name = options.Name.."Section"
+            SectionFrame.Size = UDim2.new(1, 0, 0, 36)
+            SectionFrame.BackgroundColor3 = AppleDesign.Colors.SecondaryBackground
+            SectionFrame.BorderSizePixel = 0
+            SectionFrame.AutomaticSize = Enum.AutomaticSize.Y
+            SectionFrame.Parent = TabFrame
+            
+            -- Section Corner
+            local SectionCorner = Instance.new("UICorner")
+            SectionCorner.CornerRadius = UDim.new(0, 8)
+            SectionCorner.Parent = SectionFrame
+            
+            -- Section Title
+            local SectionTitle = Instance.new("TextLabel")
+            SectionTitle.Name = "Title"
+            SectionTitle.Text = options.Name
+            SectionTitle.FontFace = AppleDesign.Font.Medium
+            SectionTitle.TextSize = 16
+            SectionTitle.TextColor3 = AppleDesign.Colors.Label
+            SectionTitle.BackgroundTransparency = 1
+            SectionTitle.Position = UDim2.new(0, 10, 0, 8)
+            SectionTitle.Size = UDim2.new(1, -20, 0, 20)
+            SectionTitle.TextXAlignment = Enum.TextXAlignment.Left
+            SectionTitle.Parent = SectionFrame
+            
+            -- Section Content
+            local SectionContent = Instance.new("Frame")
+            SectionContent.Name = "Content"
+            SectionContent.Size = UDim2.new(1, 0, 0, 0)
+            SectionContent.Position = UDim2.new(0, 0, 0, 36)
+            SectionContent.BackgroundTransparency = 1
+            SectionContent.BorderSizePixel = 0
+            SectionContent.AutomaticSize = Enum.AutomaticSize.Y
+            SectionContent.Parent = SectionFrame
+            
+            -- Section Content Layout
+            local SectionContentLayout = Instance.new("UIListLayout")
+            SectionContentLayout.Padding = UDim.new(0, 8)
+            SectionContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+            SectionContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+            SectionContentLayout.Parent = SectionContent
+            
+            -- Section Content Padding
+            local SectionContentPadding = Instance.new("UIPadding")
+            SectionContentPadding.PaddingTop = UDim.new(0, 8)
+            SectionContentPadding.PaddingBottom = UDim.new(0, 8)
+            SectionContentPadding.PaddingLeft = UDim.new(0, 8)
+            SectionContentPadding.PaddingRight = UDim.new(0, 8)
+            SectionContentPadding.Parent = SectionContent
+            
+            -- Create Button
+            function Section:CreateButton(options)
+                options = options or {}
+                options.Name = options.Name or "Button"
+                options.Callback = options.Callback or function() end
+                
+                -- Button
+                local Button = Instance.new("TextButton")
+                Button.Name = options.Name.."Button"
+                Button.Text = options.Name
+                Button.FontFace = AppleDesign.Font.Medium
+                Button.TextSize = 14
+                Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+                Button.BackgroundColor3 = AppleDesign.Colors.Primary
+                Button.Size = UDim2.new(1, 0, 0, 36)
+                Button.AutoButtonColor = false
+                Button.Parent = SectionContent
+                
+                -- Button Corner
+                local ButtonCorner = Instance.new("UICorner")
+                ButtonCorner.CornerRadius = UDim.new(0, 8)
+                ButtonCorner.Parent = Button
+                
+                -- Button Click Effect
+                Button.MouseButton1Click:Connect(function()
+                    -- Visual feedback
+                    Button.BackgroundColor3 = AppleDesign.Colors.Blue:Lerp(Color3.fromRGB(0, 0, 0), 0.2)
+                    
+                    -- Call callback
+                    options.Callback()
+                    
+                    -- Reset color
+                    task.delay(0.2, function()
+                        Button.BackgroundColor3 = AppleDesign.Colors.Primary
+                    end)
+                end)
+                
+                return Button
+            end
+            
+            -- Create Toggle
+            function Section:CreateToggle(options)
+                options = options or {}
+                options.Name = options.Name or "Toggle"
+                options.Default = options.Default or false
+                options.Callback = options.Callback or function() end
+                
+                local Toggle = {}
+                Toggle.Value = options.Default
+                
+                -- Toggle Frame
+                local ToggleFrame = Instance.new("Frame")
+                ToggleFrame.Name = options.Name.."Toggle"
+                ToggleFrame.Size = UDim2.new(1, 0, 0, 36)
+                ToggleFrame.BackgroundTransparency = 1
+                ToggleFrame.Parent = SectionContent
+                
+                -- Toggle Label
+                local ToggleLabel = Instance.new("TextLabel")
+                ToggleLabel.Name = "Label"
+                ToggleLabel.Text = options.Name
+                ToggleLabel.FontFace = AppleDesign.Font.Regular
+                ToggleLabel.TextSize = 14
+                ToggleLabel.TextColor3 = AppleDesign.Colors.Label
+                ToggleLabel.BackgroundTransparency = 1
+                ToggleLabel.Position = UDim2.new(0, 0, 0, 0)
+                ToggleLabel.Size = UDim2.new(1, -60, 1, 0)
+                ToggleLabel.TextXAlignment = Enum.TextXAlignment.Left
+                ToggleLabel.Parent = ToggleFrame
+                
+                -- Toggle Button
+                local ToggleButton = Instance.new("Frame")
+                ToggleButton.Name = "Button"
+                ToggleButton.Size = UDim2.new(0, 50, 0, 30)
+                ToggleButton.Position = UDim2.new(1, -50, 0.5, 0)
+                ToggleButton.AnchorPoint = Vector2.new(0, 0.5)
+                ToggleButton.BackgroundColor3 = Toggle.Value and AppleDesign.Colors.Green or AppleDesign.Colors.Fill
+                ToggleButton.Parent = ToggleFrame
+                
+                -- Toggle Button Corner
+                local ToggleButtonCorner = Instance.new("UICorner")
+                ToggleButtonCorner.CornerRadius = UDim.new(0, 15)
+                ToggleButtonCorner.Parent = ToggleButton
+                
+                -- Toggle Circle
+                local ToggleCircle = Instance.new("Frame")
+                ToggleCircle.Name = "Circle"
+                ToggleCircle.Size = UDim2.new(0, 26, 0, 26)
+                ToggleCircle.Position = Toggle.Value and UDim2.new(1, -28, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)
+                ToggleCircle.AnchorPoint = Vector2.new(0, 0.5)
+                ToggleCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                ToggleCircle.Parent = ToggleButton
+                
+                -- Toggle Circle Corner
+                local ToggleCircleCorner = Instance.new("UICorner")
+                ToggleCircleCorner.CornerRadius = UDim.new(0, 13)
+                ToggleCircleCorner.Parent = ToggleCircle
+                
+                -- Toggle Click Area
+                local ToggleClickArea = Instance.new("TextButton")
+                ToggleClickArea.Name = "ClickArea"
+                ToggleClickArea.Size = UDim2.new(1, 0, 1, 0)
+                ToggleClickArea.BackgroundTransparency = 1
+                ToggleClickArea.Text = ""
+                ToggleClickArea.Parent = ToggleFrame
+                
+                -- Toggle Function
+                function Toggle:Set(value)
+                    Toggle.Value = value
+                    
+                    TweenService:Create(
+                        ToggleButton,
+                        TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                        {BackgroundColor3 = Toggle.Value and AppleDesign.Colors.Green or AppleDesign.Colors.Fill}
+                    ):Play()
+                    
+                    TweenService:Create(
+                        ToggleCircle,
+                        TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                        {Position = Toggle.Value and UDim2.new(1, -28, 0.5, 0) or UDim2.new(0, 2, 0.5, 0)}
+                    ):Play()
+                    
+                    options.Callback(Toggle.Value)
+                end
+                
+                -- Toggle Click
+                ToggleClickArea.MouseButton1Click:Connect(function()
+                    Toggle:Set(not Toggle.Value)
+                end)
+                
+                -- Initialize
+                Toggle:Set(options.Default)
+                
+                return Toggle
+            end
+            
+            -- Create Slider
+            function Section:CreateSlider(options)
+                options = options or {}
+                options.Name = options.Name or "Slider"
+                options.Min = options.Min or 0
+                options.Max = options.Max or 100
+                options.Default = options.Default or options.Min
+                options.Increment = options.Increment or 1
+                options.Callback = options.Callback or function() end
+                
+                local Slider = {}
+                Slider.Value = options.Default
+                
+                -- Slider Frame
+                local SliderFrame = Instance.new("Frame")
+                SliderFrame.Name = options.Name.."Slider"
+                SliderFrame.Size = UDim2.new(1, 0, 0, 60)
+                SliderFrame.BackgroundTransparency = 1
+                SliderFrame.Parent = SectionContent
+                
+                -- Slider Label
+                local SliderLabel = Instance.new("TextLabel")
+                SliderLabel.Name = "Label"
+                SliderLabel.Text = options.Name
+                SliderLabel.FontFace = AppleDesign.Font.Regular
+                SliderLabel.TextSize = 14
+                SliderLabel.TextColor3 = AppleDesign.Colors.Label
+                SliderLabel.BackgroundTransparency = 1
+                SliderLabel.Position = UDim2.new(0, 0, 0, 0)
+                SliderLabel.Size = UDim2.new(1, 0, 0, 20)
+                SliderLabel.TextXAlignment = Enum.TextXAlignment.Left
+                SliderLabel.Parent = SliderFrame
+                
+                -- Slider Value
+                local SliderValue = Instance.new("TextLabel")
+                SliderValue.Name = "Value"
+                SliderValue.Text = tostring(Slider.Value)
+                SliderValue.FontFace = AppleDesign.Font.Medium
+                SliderValue.TextSize = 14
+                SliderValue.TextColor3 = AppleDesign.Colors.Primary
+                SliderValue.BackgroundTransparency = 1
+                SliderValue.Position = UDim2.new(1, -40, 0, 0)
+                SliderValue.Size = UDim2.new(0, 40, 0, 20)
+                SliderValue.TextXAlignment = Enum.TextXAlignment.Right
+                SliderValue.Parent = SliderFrame
+                
+                -- Slider Background
+                local SliderBackground = Instance.new("Frame")
+                SliderBackground.Name = "Background"
+                SliderBackground.Size = UDim2.new(1, 0, 0, 6)
+                SliderBackground.Position = UDim2.new(0, 0, 0.5, 5)
+                SliderBackground.BackgroundColor3 = AppleDesign.Colors.Fill
+                SliderBackground.Parent = SliderFrame
+                
+                -- Slider Background Corner
+                local SliderBackgroundCorner = Instance.new("UICorner")
+                SliderBackgroundCorner.CornerRadius = UDim.new(0, 3)
+                SliderBackgroundCorner.Parent = SliderBackground
+                
+                -- Slider Fill
+                local SliderFill = Instance.new("Frame")
+                SliderFill.Name = "Fill"
+                SliderFill.Size = UDim2.new(0, 0, 1, 0)
+                SliderFill.BackgroundColor3 = AppleDesign.Colors.Primary
+                SliderFill.Parent = SliderBackground
+                
+                -- Slider Fill Corner
+                local SliderFillCorner = Instance.new("UICorner")
+                SliderFillCorner.CornerRadius = UDim.new(0, 3)
+                SliderFillCorner.Parent = SliderFill
+                
+                -- Slider Knob
+                local SliderKnob = Instance.new("Frame")
+                SliderKnob.Name = "Knob"
+                SliderKnob.Size = UDim2.new(0, 16, 0, 16)
+                SliderKnob.Position = UDim2.new(0, 0, 0.5, 0)
+                SliderKnob.AnchorPoint = Vector2.new(0.5, 0.5)
+                SliderKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                SliderKnob.Parent = SliderFill
+                
+                -- Slider Knob Corner
+                local SliderKnobCorner = Instance.new("UICorner")
+                SliderKnobCorner.CornerRadius = UDim.new(0, 8)
+                SliderKnobCorner.Parent = SliderKnob
+                
+                -- Slider Knob Shadow
+                local SliderKnobShadow = Instance.new("ImageLabel")
+                SliderKnobShadow.Name = "Shadow"
+                SliderKnobShadow.AnchorPoint = Vector2.new(0.5, 0.5)
+                SliderKnobShadow.BackgroundTransparency = 1
+                SliderKnobShadow.Position = UDim2.new(0.5, 0, 0.5, 0)
+                SliderKnobShadow.Size = UDim2.new(1, 6, 1, 6)
+                SliderKnobShadow.ZIndex = -1
+                SliderKnobShadow.Image = "rbxassetid://6014261993"
+                SliderKnobShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+                SliderKnobShadow.ImageTransparency = 0.7
+                SliderKnobShadow.ScaleType = Enum.ScaleType.Slice
+                SliderKnobShadow.SliceCenter = Rect.new(49, 49, 450, 450)
+                SliderKnobShadow.Parent = SliderKnob
+                
+                -- Slider Click Area
+                local SliderClickArea = Instance.new("TextButton")
+                SliderClickArea.Name = "ClickArea"
+                SliderClickArea.Size = UDim2.new(1, 0, 1, 0)
+                SliderClickArea.BackgroundTransparency = 1
+                SliderClickArea.Text = ""
+                SliderClickArea.Parent = SliderBackground
+                
+                -- Slider Function
+                function Slider:Set(value)
+                    -- Clamp value to min/max
+                    value = math.clamp(value, options.Min, options.Max)
+                    
+                    -- Round to increment
+                    value = math.floor((value - options.Min) / options.Increment + 0.5) * options.Increment + options.Min
+                    
+                    -- Set value
+                    Slider.Value = value
+                    
+                    -- Update UI
+                    local percent = (Slider.Value - options.Min) / (options.Max - options.Min)
+                    
+                    SliderValue.Text = tostring(Slider.Value)
+                    
+                    TweenService:Create(
+                        SliderFill,
+                        TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                        {Size = UDim2.new(percent, 0, 1, 0)}
+                    ):Play()
+                    
+                    -- Call callback
+                    options.Callback(Slider.Value)
+                end
+                
+                -- Slider Drag
+                local dragging = false
+                
+                SliderClickArea.MouseButton1Down:Connect(function()
+                    dragging = true
+                    
+                    -- Update slider based on mouse position
+                    local function update()
+                        if dragging then
+                            local mouseX = UserInputService:GetMouseLocation().X
+                            local frameX = SliderBackground.AbsolutePosition.X
+                            local frameWidth = SliderBackground.AbsoluteSize.X
+                            
+                            local percent = math.clamp((mouseX - frameX) / frameWidth, 0, 1)
+                            local value = options.Min + (options.Max - options.Min) * percent
+                            
+                            Slider:Set(value)
+                        end
+                    end
+                    
+                    -- Initial update
+                    update()
+                    
+                    -- Connect to RenderStepped for smooth dragging
+                    local connection
+                    connection = RunService.RenderStepped:Connect(function()
+                        if dragging then
+                            update()
+                        else
+                            connection:Disconnect()
+                        end
+                    end)
+                end)
+                
+                UserInputService.InputEnded:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                        dragging = false
+                    end
+                end)
+                
+                -- Initialize
+                Slider:Set(options.Default)
+                
+                return Slider
+            end
+            
+            -- Create Dropdown
+            function Section:CreateDropdown(options)
+                options = options or {}
+                options.Name = options.Name or "Dropdown"
+                options.Options = options.Options or {}
+                options.Default = options.Default or nil
+                options.Callback = options.Callback or function() end
+                
+                local Dropdown = {}
+                Dropdown.Value = options.Default
+                Dropdown.Open = false
+                
+                -- Dropdown Frame
+                local DropdownFrame = Instance.new("Frame")
+                DropdownFrame.Name = options.Name.."Dropdown"
+                DropdownFrame.Size = UDim2.new(1, 0, 0, 36)
+                DropdownFrame.BackgroundColor3 = AppleDesign.Colors.SecondaryBackground
+                DropdownFrame.BorderSizePixel = 0
+                DropdownFrame.AutomaticSize = Enum.AutomaticSize.Y
+                DropdownFrame.ClipsDescendants = true
+                DropdownFrame.Parent = SectionContent
+                
+                -- Dropdown Corner
+                local DropdownCorner = Instance.new("UICorner")
+                DropdownCorner.CornerRadius = UDim.new(0, 8)
+                DropdownCorner.Parent = DropdownFrame
+                
+                -- Dropdown Header
+                local DropdownHeader = Instance.new("Frame")
+                DropdownHeader.Name = "Header"
+                DropdownHeader.Size = UDim2.new(1, 0, 0, 36)
+                DropdownHeader.BackgroundTransparency = 1
+                DropdownHeader.Parent = DropdownFrame
+                
+                -- Dropdown Label
+                local DropdownLabel = Instance.new("TextLabel")
+                DropdownLabel.Name = "Label"
+                DropdownLabel.Text = options.Name
+                DropdownLabel.FontFace = AppleDesign.Font.Regular
+                DropdownLabel.TextSize = 14
+                DropdownLabel.TextColor3 = AppleDesign.Colors.Label
+                DropdownLabel.BackgroundTransparency = 1
+                DropdownLabel.Position = UDim2.new(0, 10, 0, 0)
+                DropdownLabel.Size = UDim2.new(1, -50, 1, 0)
+                DropdownLabel.TextXAlignment = Enum.TextXAlignment.Left
+                DropdownLabel.Parent = DropdownHeader
+                
+                -- Dropdown Selected
+                local DropdownSelected = Instance.new("TextLabel")
+                DropdownSelected.Name = "Selected"
+                DropdownSelected.Text = Dropdown.Value or "Select..."
+                DropdownSelected.FontFace = AppleDesign.Font.Medium
+                DropdownSelected.TextSize = 14
+                DropdownSelected.TextColor3 = AppleDesign.Colors.Primary
+                DropdownSelected.BackgroundTransparency = 1
+                DropdownSelected.Position = UDim2.new(1, -30, 0, 0)
+                DropdownSelected.Size = UDim2.new(0, 20, 1, 0)
+                DropdownSelected.TextXAlignment = Enum.TextXAlignment.Right
+                DropdownSelected.Parent = DropdownHeader
+                
+                -- Dropdown Arrow
+                local DropdownArrow = Instance.new("ImageLabel")
+                DropdownArrow.Name = "Arrow"
+                DropdownArrow.Image = "rbxassetid://7072706796"
+                DropdownArrow.BackgroundTransparency = 1
+                DropdownArrow.Size = UDim2.new(0, 16, 0, 16)
+                DropdownArrow.Position = UDim2.new(1, -10, 0.5, 0)
+                DropdownArrow.AnchorPoint = Vector2.new(1, 0.5)
+                DropdownArrow.Rotation = 0
+                DropdownArrow.Parent = DropdownHeader
+                
+                -- Dropdown Content
+                local DropdownContent = Instance.new("Frame")
+                DropdownContent.Name = "Content"
+                DropdownContent.Size = UDim2.new(1, 0, 0, 0)
+                DropdownContent.Position = UDim2.new(0, 0, 0, 36)
+                DropdownContent.BackgroundTransparency = 1
+                DropdownContent.BorderSizePixel = 0
+                DropdownContent.AutomaticSize = Enum.AutomaticSize.Y
+                DropdownContent.Visible = false
+                DropdownContent.Parent = DropdownFrame
+                
+                -- Dropdown Content Layout
+                local DropdownContentLayout = Instance.new("UIListLayout")
+                DropdownContentLayout.Padding = UDim.new(0, 4)
+                DropdownContentLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+                DropdownContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                DropdownContentLayout.Parent = DropdownContent
+                
+                -- Dropdown Content Padding
+                local DropdownContentPadding = Instance.new("UIPadding")
+                DropdownContentPadding.PaddingTop = UDim.new(0, 4)
+                DropdownContentPadding.PaddingBottom = UDim.new(0, 4)
+                DropdownContentPadding.PaddingLeft = UDim.new(0, 4)
+                DropdownContentPadding.PaddingRight = UDim.new(0, 4)
+                DropdownContentPadding.Parent = DropdownContent
+                
+                -- Dropdown Click Area
+                local DropdownClickArea = Instance.new("TextButton")
+                DropdownClickArea.Name = "ClickArea"
+                DropdownClickArea.Size = UDim2.new(1, 0, 1, 0)
+                DropdownClickArea.BackgroundTransparency = 1
+                DropdownClickArea.Text = ""
+                DropdownClickArea.Parent = DropdownHeader
+                
+                -- Populate Options
+                local function createOption(option)
+                    local OptionButton = Instance.new("TextButton")
+                    OptionButton.Name = option.."Option"
+                    OptionButton.Text = option
+                    OptionButton.FontFace = AppleDesign.Font.Regular
+                    OptionButton.TextSize = 14
+                    OptionButton.TextColor3 = AppleDesign.Colors.Label
+                    OptionButton.BackgroundColor3 = AppleDesign.Colors.TertiaryBackground
+                    OptionButton.Size = UDim2.new(1, 0, 0, 30)
+                    OptionButton.AutoButtonColor = false
+                    OptionButton.Parent = DropdownContent
+                    
+                    -- Option Button Corner
+                    local OptionButtonCorner = Instance.new("UICorner")
+                    OptionButtonCorner.CornerRadius = UDim.new(0, 6)
+                    OptionButtonCorner.Parent = OptionButton
+                    
+                    -- Option Button Click
+                    OptionButton.MouseButton1Click:Connect(function()
+                        Dropdown:Select(option)
+                        Dropdown:Toggle(false)
+                    end)
+                    
+                    return OptionButton
+                end
+                
+                for _, option in ipairs(options.Options) do
+                    createOption(option)
+                end
+                
+                -- Dropdown Functions
+                function Dropdown:Toggle(state)
+                    if state == nil then
+                        state = not Dropdown.Open
+                    end
+                    
+                    Dropdown.Open = state
+                    
+                    -- Update UI
+                    DropdownContent.Visible = Dropdown.Open
+                    
+                    TweenService:Create(
+                        DropdownArrow,
+                        TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                        {Rotation = Dropdown.Open and 180 or 0}
+                    ):Play()
+                    
+                    if Dropdown.Open then
+                        DropdownFrame:TweenSize(
+                            UDim2.new(1, 0, 0, 36 + DropdownContent.AbsoluteSize.Y),
+                            Enum.EasingDirection.Out,
+                            Enum.EasingStyle.Quad,
+                            0.3,
+                            true
+                        )
+                    else
+                        DropdownFrame:TweenSize(
+                            UDim2.new(1, 0, 0, 36),
+                            Enum.EasingDirection.Out,
+                            Enum.EasingStyle.Quad,
+                            0.3,
+                            true
+                        )
+                    end
+                end
+                
+                function Dropdown:Select(option)
+                    Dropdown.Value = option
+                    DropdownSelected.Text = option
+                    options.Callback(option)
+                end
+                
+                -- Dropdown Click
+                DropdownClickArea.MouseButton1Click:Connect(function()
+                    Dropdown:Toggle()
+                end)
+                
+                -- Initialize
+                if options.Default then
+                    Dropdown:Select(options.Default)
+                end
+                
+                return Dropdown
+            end
+            
+            -- Create TextBox
+            function Section:CreateTextBox(options)
+                options = options or {}
+                options.Name = options.Name or "TextBox"
+                options.Default = options.Default or ""
+                options.PlaceholderText = options.PlaceholderText or "Enter text..."
+                options.ClearOnFocus = options.ClearOnFocus ~= nil and options.ClearOnFocus or true
+                options.Callback = options.Callback or function() end
+                
+                local TextBox = {}
+                TextBox.Value = options.Default
+                
+                -- TextBox Frame
+                local TextBoxFrame = Instance.new("Frame")
+                TextBoxFrame.Name = options.Name.."TextBox"
+                TextBoxFrame.Size = UDim2.new(1, 0, 0, 60)
+                TextBoxFrame.BackgroundTransparency = 1
+                TextBoxFrame.Parent = SectionContent
+                
+                -- TextBox Label
+                local TextBoxLabel = Instance.new("TextLabel")
+                TextBoxLabel.Name = "Label"
+                TextBoxLabel.Text = options.Name
+                TextBoxLabel.FontFace = AppleDesign.Font.Regular
+                TextBoxLabel.TextSize = 14
+                TextBoxLabel.TextColor3 = AppleDesign.Colors.Label
+                TextBoxLabel.BackgroundTransparency = 1
+                TextBoxLabel.Position = UDim2.new(0, 0, 0, 0)
+                TextBoxLabel.Size = UDim2.new(1, 0, 0, 20)
+                TextBoxLabel.TextXAlignment = Enum.TextXAlignment.Left
+                TextBoxLabel.Parent = TextBoxFrame
+                
+                -- TextBox Background
+                local TextBoxBackground = Instance.new("Frame")
+                TextBoxBackground.Name = "Background"
+                TextBoxBackground.Size = UDim2.new(1, 0, 0, 36)
+                TextBoxBackground.Position = UDim2.new(0, 0, 0, 24)
+                TextBoxBackground.BackgroundColor3 = AppleDesign.Colors.TertiaryBackground
+                TextBoxBackground.Parent = TextBoxFrame
+                
+                -- TextBox Background Corner
+                local TextBoxBackgroundCorner = Instance.new("UICorner")
+                TextBoxBackgroundCorner.CornerRadius = UDim.new(0, 8)
+                TextBoxBackgroundCorner.Parent = TextBoxBackground
+                
+                -- TextBox Input
+                local TextBoxInput = Instance.new("TextBox")
+                TextBoxInput.Name = "Input"
+                TextBoxInput.Text = TextBox.Value
+                TextBoxInput.PlaceholderText = options.PlaceholderText
+                TextBoxInput.FontFace = AppleDesign.Font.Regular
+                TextBoxInput.TextSize = 14
+                TextBoxInput.TextColor3 = AppleDesign.Colors.Label
+                TextBoxInput.PlaceholderColor3 = AppleDesign.Colors.SecondaryLabel
+                TextBoxInput.BackgroundTransparency = 1
+                TextBoxInput.Position = UDim2.new(0, 10, 0, 0)
+                TextBoxInput.Size = UDim2.new(1, -20, 1, 0)
+                TextBoxInput.TextXAlignment = Enum.TextXAlignment.Left
+                TextBoxInput.ClearTextOnFocus = options.ClearOnFocus
+                TextBoxInput.Parent = TextBoxBackground
+                
+                -- TextBox Functions
+                function TextBox:Set(value)
+                    TextBox.Value = value
+                    TextBoxInput.Text = value
+                    options.Callback(value)
+                end
+                
+                -- TextBox Events
+                TextBoxInput.FocusLost:Connect(function(enterPressed)
+                    TextBox:Set(TextBoxInput.Text)
+                end)
+                
+                -- Initialize
+                TextBox:Set(options.Default)
+                
+                return TextBox
+            end
+            
+            -- Create Label
+            function Section:CreateLabel(options)
+                options = options or {}
+                options.Text = options.Text or "Label"
+                options.Color = options.Color or AppleDesign.Colors.Label
+                
+                -- Label Frame
+                local LabelFrame = Instance.new("Frame")
+                LabelFrame.Name = "Label"
+                LabelFrame.Size = UDim2.new(1, 0, 0, 20)
+                LabelFrame.BackgroundTransparency = 1
+                LabelFrame.Parent = SectionContent
+                
+                -- Label Text
+                local LabelText = Instance.new("TextLabel")
+                LabelText.Name = "Text"
+                LabelText.Text = options.Text
+                LabelText.FontFace = AppleDesign.Font.Regular
+                LabelText.TextSize = 14
+                LabelText.TextColor3 = options.Color
+                LabelText.BackgroundTransparency = 1
+                LabelText.Size = UDim2.new(1, 0, 1, 0)
+                LabelText.TextWrapped = true
+                LabelText.Parent = LabelFrame
+                
+                -- Label Functions
+                local Label = {}
+                
+                function Label:Set(text)
+                    LabelText.Text = text
+                end
+                
+                function Label:SetColor(color)
+                    LabelText.TextColor3 = color
+                end
+                
+                return Label
+            end
+            
+            return Section
+        end
+        
+        if first then
+            first = false
+        end
+        
+        return Tab
+    end
+    
+    -- Keybind to minimize
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if not gameProcessed and input.KeyCode == options.MinimizeKey then
+            minimized = not minimized
+            if minimized then
+                MainFrame:TweenSize(UDim2.new(0, options.Size.X.Offset, 0, 50), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.3, true)
+            else
+                MainFrame:TweenSize(options.Size, Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 0.3, true)
+            end
+        end
+    end)
+    
+    return Window
+end
+
+return Fluent
