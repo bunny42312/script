@@ -21,12 +21,13 @@ local Camera = workspace.CurrentCamera
 -- Apple Design System
 local AppleDesign = {
     -- SF Pro Font Family
-    Font = {
-        Title = Font.new("rbxasset://fonts/families/SFProDisplay-Bold.otf", Enum.FontWeight.Bold, Enum.FontStyle.Normal),
-        Subtitle = Font.new("rbxasset://fonts/families/SFProDisplay-Semibold.otf", Enum.FontWeight.SemiBold, Enum.FontStyle.Normal),
-        Regular = Font.new("rbxasset://fonts/families/SFProText-Regular.otf", Enum.FontWeight.Regular, Enum.FontStyle.Normal),
-        Medium = Font.new("rbxasset://fonts/families/SFProText-Medium.otf", Enum.FontWeight.Medium, Enum.FontStyle.Normal),
-        Light = Font.new("rbxasset://fonts/families/SFProText-Light.otf", Enum.FontWeight.Light, Enum.FontStyle.Normal),
+      -- SF Pro Font Family
+      Font = {
+        Title = Enum.Font.GothamBold,
+        Subtitle = Enum.Font.GothamSemibold,
+        Regular = Enum.Font.Gotham,
+        Medium = Enum.Font.GothamMedium,
+        Light = Enum.Font.GothamLight,
     },
     
     -- Apple Color Palette
