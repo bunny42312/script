@@ -133,7 +133,7 @@ local aa = {
             DialogOpen = false,
             UseAcrylic = false,
             Acrylic = false,
-            Transparency = false,
+            Transparency = true,
             MinimizeKeybind = nil,
             MinimizeKey = Enum.KeyCode.LeftControl,
             GUI = w
@@ -531,11 +531,7 @@ local aa = {
                 k(
                 "TextLabel",
                 {
-                    FontFace = Font.new(
-                        "rbxasset://fonts/families/GothamSSm.json",
-                        Enum.FontWeight.Bold, -- Use Bold for a strong, modern look
-                        Enum.FontStyle.Normal
-                    ),
+                    FontFace = Font.new "rbxasset://fonts/families/GothamSSm.json",
                     TextColor3 = Color3.fromRGB(200, 200, 200),
                     TextSize = 14,
                     TextWrapped = true,
